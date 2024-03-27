@@ -61,17 +61,19 @@ int main(int argc, char* argv[]) {
         struct libnet_ethernet_hdr* eth = (struct libnet_ethernet_hdr*)packet;
         if (ntohs(eth->ether_type) == 0x0800) { 
             struct libnet_ipv4_hdr* ipv4 = (struct libnet_ipv4_hdr*)(packet + sizeof(struct libnet_ethernet_hdr));
-            if (ipv4->ip_p == IPPROTO_TCP) { 
+            if (ipv4->ip_p == 6) { 
                 struct libnet_tcp_hdr* tcp = (struct libnet_tcp_hdr*)((u_char*)ipv4 + (ipv4->ip_hl << 2));
 
-                printf("SRC MAC: \n");
+                printf("SRC MAC:\n");
+		    
                 for(int i = 0; i < 6; i++) printf("%02x:", eth->ether_shost[i]);
-                printf("DST MAC: \n");
+                printf("DST MAC:\n");
+		    
                 for(int i = 0; i < 6; i++) printf("%02x:", eth->ether_dhost[i]);
-                printf("\nSRC IP: %s\n", inet_ntoa(ipv4->ip_src));
-                printf("DST IP: %s\n", inet_ntoa(ipv4->ip_dst));
-                printf("SRC PORT: %d\n", ntohs(tcp->th_sport));
-                printf("DST PORT: %d\n", ntohs(tcp->th_dport));
+                printf("SRC IP:%s\n", inet_ntoa(ipv4->ip_src));
+                printf("DST IP:%s\n", inet_ntoa(ipv4->ip_dst));
+                printf("SRC PORT:%d\n", ntohs(tcp->th_sport));
+                printf("DST PORT:%d\n", ntohs(tcp->th_dport));
 
                 const u_char* payload = (u_char*)tcp + (tcp->th_off << 2);
                 int len = ntohs(ipv4->ip_len) - (ipv4->ip_hl << 2) - (tcp->th_off << 2);
